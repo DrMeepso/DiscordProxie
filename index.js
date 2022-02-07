@@ -242,7 +242,7 @@ wss.on('connection', function connection(ws) {
                                     }
                                 },
                                 auth: false
-                            })
+                            }).catch(err => ws.send(`{"message": "error", "error": "${err.message}" }`))
 
                             break;
 
