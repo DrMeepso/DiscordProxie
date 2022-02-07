@@ -5,13 +5,12 @@ const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 var http = require('http');
 
-var server = http.createServer(function(request, response) {
+var server = http.createServer(function (request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
-    response.write('C3 Discord Interfece By Meepso!')
     response.writeHead(404);
     response.end();
 });
-server.listen(process.env.PORT || 3000, function() {
+server.listen(process.env.PORT || 3000, function () {
     console.log("Binded HTTP server")
 });
 
@@ -33,7 +32,7 @@ wss.on('connection', function connection(ws) {
 
     ws.on('message', function message(data) {
 
-        if(IsJsonString(data.toString()) == false) return
+        if (IsJsonString(data.toString()) == false) return
 
         req = JSON.parse(data.toString())
 
@@ -84,16 +83,16 @@ wss.on('connection', function connection(ws) {
 
                 ws.on('close', (number, reson) => {
 
-                        bot.user.setStatus('Invisible')
-                        bot.destroy()
-                        console.log("Bot destroyed")
+                    bot.user.setStatus('Invisible')
+                    bot.destroy()
+                    console.log("Bot destroyed")
 
                 })
 
 
                 ws.on('message', function message(data) {
 
-                    if(IsJsonString(data.toString()) == false) return
+                    if (IsJsonString(data.toString()) == false) return
 
                     req = JSON.parse(data.toString())
 
@@ -205,30 +204,37 @@ wss.on('connection', function connection(ws) {
 
                         case 'createcommand':
 
-                            command = new SlashCommandBuilder()
-                                .setName(req.commandName.toLowerCase())
-                                .setDescription(req.commandDescription)
+                            commandList = []
 
-                            Object.values(JSON.parse(req.commandPrams)).forEach((value, index) => {
+                            Object.values(req).forEach((currentcommand, index) => {
 
-                                if (value.pramType == "string") {
+                                if (!currentcommand.commandName) return
 
-                                    var req
-                                    if (value.pramRequired == 'true') { req = true } else { req = false }
-                                    command.addStringOption(option => {
-                                        return option
-                                            .setName(value.pramName)
-                                            .setDescription(value.pramDesc)
-                                            .setRequired(req)
-                                    })
-                                }
+                                command = new SlashCommandBuilder()
+                                    .setName(currentcommand.commandName.toLowerCase())
+                                    .setDescription(currentcommand.commandDescription)
+
+                                Object.values(JSON.parse(currentcommand.commandPrams)).forEach((value, index) => {
+
+                                    if (value.pramType == "string") {
+
+                                        var req
+                                        if (value.pramRequired == 'true') { req = true } else { req = false }
+                                        command.addStringOption(option => {
+                                            return option
+                                                .setName(value.pramName)
+                                                .setDescription(value.pramDesc)
+                                                .setRequired(req)
+                                        })
+                                    }
+                                })
+                                commandList.push(command)
                             })
+
 
                             setTimeout(() => {
 
-                                const commands = [
-                                    command,
-                                ].map(command => command.toJSON());
+                                const commands = commandList.map(command => command.toJSON());
 
                                 var rest = new REST({ version: '9' }).setToken(bot.token);
 
