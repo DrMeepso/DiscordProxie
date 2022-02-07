@@ -1,10 +1,22 @@
-const WebSocket = require("ws")
+const WebSocketServer = require("ws").Server
 const Discordjs = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
+var http = require('http');
 
-const wss = new WebSocket.Server({ port: 8080 });
+var server = http.createServer(function(request, response) {
+    console.log((new Date()) + ' Received request for ' + request.url);
+    response.writeHead(404);
+    response.end();
+});
+server.listen(process.env.PORT || 3000, function() {
+    console.log("Binded HTTP server")
+});
+
+const wss = new WebSocketServer({ server: server });
+
+
 
 wss.on('connection', function connection(ws) {
 
