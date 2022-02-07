@@ -7,6 +7,7 @@ var http = require('http');
 
 var server = http.createServer(function(request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
+    response.write('C3 Discord Interfece By Meepso!')
     response.writeHead(404);
     response.end();
 });
@@ -15,8 +16,6 @@ server.listen(process.env.PORT || 3000, function() {
 });
 
 const wss = new WebSocketServer({ server: server });
-
-
 
 wss.on('connection', function connection(ws) {
 
