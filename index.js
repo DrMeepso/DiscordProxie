@@ -68,7 +68,7 @@ wss.on('connection', function connection(ws) {
 
                 bot.on("messageCreate", (umsg) => {
 
-                    ws.send(`{"message": "guildMessage", "msgContent": "${umsg.content}", "msgAuthor": "${umsg.author.username}", "msgAuthorID": "${umsg.author.id}", "msgServerID": "${umsg.guild.id}", "msgServerName": "${umsg.guild.name}", "msgChannelID": "${umsg.channel.id}", "msgChannelName": "${umsg.channel.name}"}`)
+                    ws.send(`{"message": "guildMessage", "msgContent": "${umsg.content}", "msgAuthor": ${ JSON.stringify( umsg.author )}, "msgServer": ${  JSON.stringify( umsg.guild )}, "msgChannel": ${ JSON.stringify(umsg.channel)}}`)
 
                 })
 
@@ -76,8 +76,7 @@ wss.on('connection', function connection(ws) {
                 bot.on('interactionCreate', async interaction => {
                     if (!interaction.isCommand()) return;
 
-                    ws.send(`{"message": "interaction", "type": "command", "name": "${interaction.commandName}", "id": "${interaction.id}", "token": "${interaction.token}", "authorID": "${interaction.user.id}", "options": ${JSON.stringify(interaction.options.data)}}`)
-
+                    ws.send(`{"message": "interaction", "type": "command", "name": "${interaction.commandName}", "id": "${interaction.id}", "token": "${interaction.token}", "author": ${JSON.stringify(interaction.member.user)}, "channel": ${JSON.stringify(interaction.channel)}, "guild": ${JSON.stringify(interaction.guild)}, "options": ${JSON.stringify(interaction.options.data)}}`)
 
                 });
 
@@ -214,7 +213,7 @@ wss.on('connection', function connection(ws) {
                                     .setName(currentcommand.commandName.toLowerCase())
                                     .setDescription(currentcommand.commandDescription)
 
-                                Object.values(JSON.parse(currentcommand.commandPrams)).forEach((value, index) => {
+                                currentcommand.commandPrams.forEach((value, index) => {
 
                                     if (value.pramType == "string") {
 
@@ -230,15 +229,13 @@ wss.on('connection', function connection(ws) {
                                 })
                                 commandList.push(command)
                             })
-
+                            
 
                             setTimeout(() => {
 
-                                const commands = commandList.map(command => command.toJSON());
-
                                 var rest = new REST({ version: '9' }).setToken(bot.token);
 
-                                rest.put(Routes.applicationGuildCommands(bot.user.id, '691458137261342760'), { body: commands })
+                                rest.put(Routes.applicationGuildCommands(bot.user.id, '691458137261342760'), { body: commandList })
                                     .then(() => ws.send('{"message": "botUpdate", "update": "slashcommandsregistered"}'))
                                     .catch((err) => ws.send(`{"message": "error", "error": ${JSON.stringify(err.rawError)} }`));
 
