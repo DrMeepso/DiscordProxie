@@ -156,7 +156,7 @@ wss.on('connection', function connection(ws) {
                             var targetGuild = guilds.cache.get(req.ServerID);
                             var member = targetGuild.members.cache.find(user => user.id === req.UserID);
 
-                            ws.send(`{"message": "getusername", "name": "${member.user.username}", callBack: "${req.CallBack}"}`)
+                            ws.send(`{"message": "getusername", "name": "${member.user.username}", "callBack": "${req.CallBack}"}`)
 
                             break;
 
@@ -222,7 +222,7 @@ wss.on('connection', function connection(ws) {
                                 var rest = new REST({ version: '9' }).setToken(bot.token);
 
                                 rest.put(Routes.applicationGuildCommands(bot.user.id, '691458137261342760'), { body: commands })
-                                    .then(() => ws.send('{"message": "botUpdate", "update": "slashcommandsregisterd"}'))
+                                    .then(() => ws.send('{"message": "botUpdate", "update": "slashcommandsregistered"}'))
                                     .catch((err) => ws.send(`{"message": "error", "error": ${JSON.stringify(err.rawError)} }`));
 
                             }, 200);
