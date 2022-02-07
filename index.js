@@ -17,15 +17,33 @@ server.listen(process.env.PORT || 3000, function() {
 
 const wss = new WebSocketServer({ server: server });
 
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
 wss.on('connection', function connection(ws) {
 
     var isloggedin = false
     var bot = null
 
     ws.on('message', function message(data) {
+
+        if(IsJsonString(data.toString()) == false) return
+
         req = JSON.parse(data.toString())
 
         if (req.message == "login") {
+            if (isloggedin) {
+
+                ws.send('{"message": "error", "error": "cant signin twice"}')
+                return
+
+            }
             if (req.auth == '0F6myoD0vRd*FQ') {
 
                 ws.send('{"message": "loggedin"}')
@@ -66,24 +84,17 @@ wss.on('connection', function connection(ws) {
 
                 ws.on('close', (number, reson) => {
 
-                    bot.user.setActivity("Meepso's content", {
-                        type: "STREAMING",
-                        url: "https://www.twitch.tv/drmeepso"
-                      });
-
-                    setTimeout(() => {
-
                         bot.user.setStatus('Invisible')
-
                         bot.destroy()
                         console.log("Bot destroyed")
-
-                    }, 10000);
 
                 })
 
 
                 ws.on('message', function message(data) {
+
+                    if(IsJsonString(data.toString()) == false) return
+
                     req = JSON.parse(data.toString())
 
                     switch (req.message) {
