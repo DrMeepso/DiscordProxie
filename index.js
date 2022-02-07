@@ -10,6 +10,7 @@ var server = http.createServer(function (request, response) {
     response.writeHead(404);
     response.end();
 });
+
 server.listen(process.env.PORT || 3000, function () {
     console.log("Binded HTTP server")
 });
