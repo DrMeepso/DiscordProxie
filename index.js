@@ -83,6 +83,8 @@ wss.on('connection', function connection(ws) {
 
                 ws.on('close', (number, reson) => {
 
+                    if(!bot.token) return
+                        
                     bot.user.setStatus('Invisible')
                     bot.destroy()
                     console.log("Bot destroyed")
