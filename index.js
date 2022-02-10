@@ -236,7 +236,7 @@ wss.on('connection', function connection(ws) {
 
                                 var rest = new REST({ version: '9' }).setToken(bot.token);
 
-                                rest.put(Routes.applicationGuildCommands(bot.user.id, '691458137261342760'), { body: commandList })
+                                rest.put(Routes.applicationGuildCommands(bot.user.id, req.ServerID), { body: commandList })
                                     .then(() => ws.send('{"message": "botUpdate", "update": "slashcommandsregistered"}'))
                                     .catch((err) => ws.send(`{"message": "error", "error": ${JSON.stringify(err.rawError)} }`));
 
